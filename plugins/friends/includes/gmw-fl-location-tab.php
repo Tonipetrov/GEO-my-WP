@@ -276,60 +276,62 @@ class GMW_FL_Location_Page {
         }
 
         echo '<div class="gmw-yl-section-wrapper gmw-yl-' . $section . '-section-wrapper">';
-        
+
 	        if ( isset( $title ) && $title == true ) {
 	        	echo '<p id="gmw-yl-' . $section . '-title" class="field-title">' . $location_fields[$section][0] . '</p>';
 	        }
-	        
+
 	        echo '<' . $element[0] . '  class="gmw-yl-fields-wrapper ' . $tag_class . '">';
-	               
+
 		        foreach ( $location_fields[$section][1] as $key => $option ) {
-	
+
 		        	$title 		 = ( !empty( $option['title'] ) ) 		   ? $option['title'] : '';
 		        	$placeholder = ( !empty( $option['placeholder'] ) )    ? 'placeholder="' . $option['placeholder'] . '"' : '';
 		            $class       = !empty( $option['class'] ) 			   ? $option['class'] : '';
 		            $id          = !empty( $option['id'] ) 				   ? $option['id'] : '';
-		            
+
 		            if ( ( $section == 'address_fields' || $section == 'latlng_fields' || $section == 'address_autocomplete' ) && empty( $location ) ) {
 		            	$optionName = ( $option['name'] == 'long' ) ? 'lng' : $option['name'];
 		            	$value = ( isset( $_COOKIE['gmw_'.$optionName] ) ) ? urldecode( $_COOKIE['gmw_'.$optionName] ) : '';
 		            } else {
-		            	$value = ( isset( $location->$option['name'] ) ) ? $location->$option['name'] : '';
-		            }      
-		            
+                  //added to fix Notice: Array to string conversion in PHP 7
+                  $opt_name = $option['name'];
+		            	$value = ( isset( $location->$opt_name ) ) ? $location->$opt_name : '';                  
+		            }
+
 		            $attributes  = array();
 		            $hidden      = ( $option['type'] == 'hidden' ) ? 'style="display:none"' : '';
-		
+
 		            if ( !empty( $option['attributes'] ) && is_array( $option['attributes'] ) ) {
 		                foreach( $option['attributes'] as $attribute_name => $attribute_value ) {
 		                    $attributes[] = esc_attr( $attribute_name ) . '="' . esc_attr( $attribute_value ) . '"';
 		                }
 		            }
-		
+
 		            if ( $tag != 'div' ) echo '<' . $element[1] . ' ' . $hidden . ' >';
-		
+
 			            if ( isset( $option['label'] ) && !empty( $option['label'] ) ) {
-			
+
 			               if ( $tag == 'table' ) echo '<' . $element[2] . '>';
-			
+
 			                	echo '<label for="setting-' . $option['name'] . '" >' . $option['label'] . '</label>';
-			
+
 			                if ( $tag == 'table' ) echo '</' . $element[2] . '>';
 			            }
-			            
+
 			            	if ( $tag == 'table' ) echo '<' . $element[3] . '>';
-		
+
 					            switch ( $option['type'] ) {
-					
+
 					                case "checkbox" :
 					                    ?>
 					                    <label>
-					                    	<input type="checkbox" name="gmw_<?php echo $option['name']; ?>" id="<?php echo $id; ?>" class="<?php echo $class; ?>" value="1" <?php echo implode(' ', $attributes); ?> <?php checked('1', $value); ?> /> 
+					                    	<input type="checkbox" name="gmw_<?php echo $option['name']; ?>" id="<?php echo $id; ?>" class="<?php echo $class; ?>" value="1" <?php echo implode(' ', $attributes); ?> <?php checked('1', $value); ?> />
 					                    	<?php echo $option['cb_label']; ?>
 					                    </label>
 					                    <?php
 					                break;
-					                
+
 					                case "textarea" :
 					                    ?>
 					                    <textarea name="gmw_<?php echo $option['name']; ?>" id="<?php echo $id; ?>" class="<?php echo $class; ?>" cols="50" rows="3"  <?php echo implode(' ', $attributes); ?> <?php echo $placeholder; ?>>
@@ -337,7 +339,7 @@ class GMW_FL_Location_Page {
 					                    </textarea>
 					                    <?php
 					                break;
-					                
+
 					                case "select" :
 					                    ?>
 					                    <select name="gmw_<?php echo $option['name']; ?>" id="<?php echo $id; ?>" class="<?php echo $class; ?>" <?php echo implode(' ', $attributes); ?>>
@@ -349,13 +351,13 @@ class GMW_FL_Location_Page {
 					                    </select>
 					                    <?php
 					                break;
-					                
+
 					                case "password" :
 					                    ?>
 					                    <input id="<?php echo $id; ?>" class="<?php echo $class; ?>" type="password" name="gmw_<?php echo $option['name']; ?>" value="<?php esc_attr_e($value); ?>" <?php echo implode(' ', $attributes); ?> <?php echo $placeholder; ?> />
 					                    <?php
 					                break;
-					                
+
 					                case "div" :
 					                	?>
 					                	<div id="<?php echo $option['id']; ?>" class="<?php echo $class; ?>" <?php echo implode(' ', $attributes); ?>>
@@ -363,7 +365,7 @@ class GMW_FL_Location_Page {
 					                	</div>
 					                	<?php
 					                break;
-					                
+
 					                case "text" :
 					                    ?>
 					                    	<input type="text" name="gmw_<?php echo $option['name']; ?>" id="<?php echo $id; ?>" class="<?php echo $class; ?>"  value="<?php esc_attr_e($value); ?>" <?php echo implode(' ', $attributes); ?> <?php echo $placeholder; ?> />
@@ -372,34 +374,34 @@ class GMW_FL_Location_Page {
 					                        echo ' <p class="description">' . $option['desc'] . '</p>';
 					                    }
 					                break;
-					                
+
 					                case "button" :
 					                	?>
 					                     	<input type="button" name="gmw_<?php echo $option['name']; ?>" id="<?php echo $id; ?>" class="<?php echo $class; ?>"  value="<?php echo $title; ?>" <?php echo implode(' ', $attributes); ?> />
 					               		<?php
 					                break;
-					                
+
 					                case "hidden" :
 					                    ?>
 					                    	<input type="hidden" name="gmw_<?php echo $option['name']; ?>" id="<?php echo $id; ?>" class="<?php echo $class; ?> gmw-yl-hidden-field"  value="<?php echo $value; ?>" <?php echo implode(' ', $attributes); ?> />
 					                    <?php
 					                break;
-					                
+
 					            }
-		
+
 		            		if ( $tag == 'table' ) echo '</' . $element[3] . '>';
-		
+
 		            if ( $tag != 'div' ) echo '</' . $element[1] . '>';
 		        }
-	
+
 	        echo '</' . $element[0] . '>';
-	        
+
 		echo '</div>';
 
     }
 
     public function display_location_form( $location, $user_id ) {
-    	
+
     	$fieldsLabel = apply_filters( 'gmw_fl_your_location_page_titles', array(
     			'your_location' 	=> __( 'Your Location', 'GMW' ),
     			'no_location' 		=> __( "You haven't set a location yet", 'GMW' ),
@@ -410,110 +412,111 @@ class GMW_FL_Location_Page {
     			'coords' 			=> __( 'Latitude / Longitude', 'GMW' ),
     			'save_location' 	=> __( 'Save Location', 'GMW' ),
     	) );
-    	
+
         ?>
         <div id="gmw-your-location-wrapper">
-			
+
 			<?php do_action( 'gmw_yl_page_start', $location, $user_id ); ?>
 
             <div id="your-location-section">
-            	
+
             	<p class="field-title"><?php echo $fieldsLabel['your_location']; ?></p>
-            	
+
             	<div id="your-location-section-inner">
-            		<input type="text" id="gmw-yl-field" value="<?php echo ( isset($location->formatted_address) ) ? $location->formatted_address : $fieldsLabel['no_location']; ?>" disabled="disabled" />
+                <?php //escaped $location->formatted_address as otherwise it gets slashed when there are quotes ?>
+            		<input type="text" id="gmw-yl-field" value="<?php echo ( isset($location->formatted_address) ) ? esc_html( $location->formatted_address ) : $fieldsLabel['no_location']; ?>" disabled="disabled" />
             		<input type="button" id="gmw-yl-edit" class="first" value="<?php echo $fieldsLabel['edit_location']; ?>" />
             		<input type="button" id="gmw-yl-delete" value="<?php echo $fieldsLabel['delete_location']; ?>" />
            			<img src="<?php echo GMW_FL_URL . 'assets/images/ajax-loader.gif'; ?>" id="gmw-yl-spinner" alt="" />
            		</div>
 
             </div>
-                
+
             <?php do_action( 'gmw_yl_before_form', $location, $user_id ); ?>
-                
+
                 <form id="gmw-yl-form" name="gmw_yl_location_form" method="post" action="">
-                
+
                 	<?php do_action('gmw_yl_form_start', $location, $user_id ); ?>
-					
+
 					<!--  locator button -->
-                    <?php echo $this->display_location_fields('locator', 'div', 'locate-me-button', false ); ?>                
-  
+                    <?php echo $this->display_location_fields('locator', 'div', 'locate-me-button', false ); ?>
+
                     <?php do_action( 'gmw_yl_before_map', $location, $user_id ); ?>
 
      				<!-- Display Map -->
-					<?php echo $this->display_location_fields( 'map', 'div', 'map-wrapper', true ); ?> 
-					
+					<?php echo $this->display_location_fields( 'map', 'div', 'map-wrapper', true ); ?>
+
                     <?php do_action( 'gmw_yl_before_autocomplete', $location, $user_id ); ?>
 
                     <!--  autocomplete -->
                     <?php echo $this->display_location_fields( 'address_autocomplete', 'div', 'location', true ); ?>
 
                     <?php do_action( 'gmw_yl_before_manuall_section', $location, $user_id ); ?>
-                    
+
                     <!-- menually section -->
                     <div id="gmw-yl-manuall-section">
-                    
+
                     	<p class="field-title"><?php echo $fieldsLabel['manualy_enter']; ?></p>
-						
+
 						<div id="gmw-yl-tabs-section">
-						
+
 	                    	<!-- tabs -->
 	                        <ul id="gmw-yl-tabs">
-								
+
 								<?php echo do_action( 'gmw_yl_tabs_start', $location, $user_id ); ?>
-								
+
 	                            <li id="gmw-yl-address-tab" class="gmw-yl-tab active"><?php echo $fieldsLabel['address']; ?></li>
 	                            <li id="gmw-yl-latlng-tab" class="gmw-yl-tab" ><?php echo $fieldsLabel['coords']; ?></li>
-	
+
 	                            <?php echo do_action( 'gmw_yl_tabs_end', $location, $user_id ); ?>
 	                        </ul>
-	                        
+
 	                        <?php echo do_action( 'gmw_yl_before_tabs_wrapper', $location, $user_id ); ?>
-	
+
 	                        <!-- address tab -->
 	                        <div id="gmw-yl-address-tab-wrapper" class="gmw-yl-tab-wrapper address">
-	
+
 	                            <?php do_action( 'gmw_yl_address_tab_start', $location, $user_id ); ?>
-	
+
 	                            <?php echo $this->display_location_fields( 'address_fields', 'table', 'location', false ); ?>
-	
+
 	                            <?php do_action( 'gmw_yl_address_tab_end', $location, $user_id ); ?>
-	
+
 	                        </div>
-							
+
 							<!-- coords tab -->
 	                        <div id="gmw-yl-latlng-tab-wrapper" class="gmw-yl-tab-wrapper latlng" style="display:none;">
-	
+
 	                            <?php do_action('gmw_yl_latlng_tab_start', $location, $user_id ); ?>
-	
+
 	                            <?php echo $this->display_location_fields('latlng_fields', 'table', 'location', false); ?>
-	
+
 	                            <?php do_action('gmw_yl_latlng_tab_end', $location, $user_id ); ?>
-	
+
 	                        </div>
-	
+
 	                        <?php echo do_action( 'gmw_yl_after_tabs_wrapper', $location, $user_id ); ?>
-	
+
 	                        <div id="gmw-yl-address-tab-btn-wrapper" class="update-btn-wrapper">
 	                            <input type="button" id="gmw-yl-get-latlng" value="<?php echo $fieldsLabel['save_location']; ?>" />
 	                        </div>
-	
+
 	                        <div id="gmw-yl-latlng-tab-btn-wrapper" class="update-btn-wrapper" style="display:none;">
 	                            <input type="button" id="gmw-yl-get-address" value="<?php echo $fieldsLabel['save_location']; ?>" />
 	                        </div>
-	                
+
 	                	</div>
-                        
+
                     </div>
-                    
+
                     <?php do_action('gmw_yl_form_end', $location, $user_id ); ?>
-                    
+
                     <input type="hidden" id="gmw-yl-update-location" class="" value="" />
 
                 </form>
-                
-				<div id="gmw-yl-message"><p></p></div>		
-				
+
+				<div id="gmw-yl-message"><p></p></div>
+
                 <?php do_action('gmw_yl_after_form', $location, $user_id ); ?>
 
         </div>
